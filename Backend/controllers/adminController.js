@@ -148,7 +148,7 @@ const createProduct = asyncHandler(async (req, res) => {
     description,
   });
   await product.save();
-  res.json({ msg: ' Product Created successfully' });
+  res.json({ msg: 'Product Created successfully' });
 });
 
 module.exports = {
