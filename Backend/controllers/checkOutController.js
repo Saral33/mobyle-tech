@@ -7,7 +7,7 @@ const saveCheckout = asyncHandler(async (req, res) => {
 
   const checkOut = new CheckOut({
     user: req.user.id,
-    name: req.user.username,
+    username: req.user.username,
     lineItems,
   });
   await checkOut.save();
