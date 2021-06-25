@@ -1,13 +1,14 @@
 const CheckOut = require('../Models/checkoutModel');
 const asyncHandler = require('express-async-handler');
+const User = require('../Models/userModel');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const saveCheckout = asyncHandler(async (req, res) => {
   const { lineItems } = req.body;
-
+  const user = await User.findById(req.user.id);
   const checkOut = new CheckOut({
     user: req.user.id,
-    username: req.user.username,
+    username: user.username,
     lineItems,
   });
   await checkOut.save();
