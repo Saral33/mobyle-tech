@@ -142,7 +142,7 @@ const createProduct = asyncHandler(async (req, res) => {
     quantity,
     screen,
     os,
-    rem,
+    ram,
     rearCamera,
     frontCamera,
     description,
