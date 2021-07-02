@@ -1,4 +1,4 @@
-import React, { useEffect , useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Col,
@@ -10,84 +10,105 @@ import {
 } from 'react-bootstrap';
 import Rating from '../components/Ratings';
 import { Link } from 'react-router-dom';
-import { getProductDetails,giveReview } from '../actions/productActions';
+import { getProductDetails, giveReview } from '../actions/productActions';
 import { useDispatch, useSelector } from 'react-redux';
 import Loader from '../components/Loader';
 import AlertMessage from '../components/AlertMessage';
-import LoadingButton from '../components/LoadingButton'
+import LoadingButton from '../components/LoadingButton';
 import axios from 'axios';
-import { CREATE_REVIEW_RESET,ADD_CART_RESET } from '../actions/constants';
-import {addToCart} from '../actions/cartActions'
+import { CREATE_REVIEW_RESET, ADD_CART_RESET } from '../actions/constants';
+import { addToCart } from '../actions/cartActions';
 
 const ProductDetailScreen = ({ match, history, location }) => {
   const dispatch = useDispatch();
-  const [star,setStar] = useState(0) //For rating
-  const [id,setId] = useState('')
-  const [show,setShow] = useState('')
-  const [comment,setComment] = useState('') //For review
+  const [star, setStar] = useState(0); //For rating
+  const [id, setId] = useState('');
+  const [show, setShow] = useState('');
+  const [comment, setComment] = useState(''); //For review
 
-  const [color,setColor] = useState('')
-  const [version,setVersion] = useState('')
+  const [color, setColor] = useState('');
+  const [version, setVersion] = useState('');
   const { loading, product, error } = useSelector(
     (state) => state.singleProduct
   );
-  const {loading:reviewLoading, success, error:reviewError} = useSelector(state=> state.reviewState)
+  const {
+    loading: reviewLoading,
+    success,
+    error: reviewError,
+  } = useSelector((state) => state.reviewState);
   const { authenticated } = useSelector((state) => state.authState);
-  const {loading:cartLoading, success:cartSuccess, error:cartError} = useSelector(state=> state.cartAction)
+  const {
+    loading: cartLoading,
+    success: cartSuccess,
+    error: cartError,
+  } = useSelector((state) => state.cartAction);
   const redirect = location.search ? location.search.split('=')[1] : null;
 
-  
   useEffect(() => {
-    dispatch({type:ADD_CART_RESET})
-    dispatch({type:CREATE_REVIEW_RESET})
-    if(success || match.params.id ||match.params.name ){
-        if (match.params.id) {
-            dispatch(getProductDetails(match.params.id));
-         } else {
-         const fetchId = async () => {
-           const { data } = await axios.get(
-             `/api/products/search/${match.params.name}`
-           );
-           dispatch(getProductDetails(data));
-           setId(data)
-         };
-         fetchId();
-       }
-        setComment('')
-        setStar('')
+    dispatch({ type: ADD_CART_RESET });
+    dispatch({ type: CREATE_REVIEW_RESET });
+    if (success || match.params.id || match.params.name) {
+      if (match.params.id) {
+        dispatch(getProductDetails(match.params.id));
+      } else {
+        const fetchId = async () => {
+          const { data } = await axios.get(
+            `/api/products/search/${match.params.name}`
+          );
+          dispatch(getProductDetails(data));
+          setId(data);
+        };
+        fetchId();
+      }
+      setComment('');
+      setStar('');
     }
-    if(success){
-        setShow('Review Submitted')
+    if (success) {
+      setShow('Review Submitted');
     }
+  }, [match, dispatch, success]);
+  const reviewHandler = (e) => {
+    e.preventDefault();
+    dispatch(
+      giveReview(
+        { rating: star, review: comment },
+        match.params.id || (id && id)
+      )
+    );
+  };
 
-  }, [match, dispatch,success]);
-  const reviewHandler = e =>{
-    e.preventDefault()
-      dispatch(giveReview({rating:star,review:comment},(match.params.id || (id && id))))
-      
-}
-
-const addToCartHandler = () =>{
-  if(!authenticated){
-    return history.push(`/login?redirect=/product/${match.params.id || (id&&id)}`)
-  }
-   const price = version.split(' ')[0]
-   const finalVersion = version.split(' ')[1]
-    if(price && finalVersion){
-      dispatch(addToCart({price,version:finalVersion, image:color},match.params.id || (id&&id)))
-      window.scrollTo(0,0)
+  const addToCartHandler = () => {
+    if (!authenticated) {
+      return history.push(
+        `/login?redirect=/product/${match.params.id || (id && id)}`
+      );
     }
-}
+    let price = version.split(' ')[0];
+    const finalVersion = version.split(' ')[1];
+    if (price.includes('$')) {
+      price = price.replace('$', '');
+      console.log(price);
+    }
+    if (price && finalVersion) {
+      dispatch(
+        addToCart(
+          { price, version: finalVersion, image: color },
+          match.params.id || (id && id)
+        )
+      );
+      window.scrollTo(0, 0);
+    }
+  };
 
   return (
-    <div className='my-5 p-3'>
+    <div className="my-5 p-3">
       <Button
-        variant='outline-dark'
+        variant="outline-dark"
         onClick={() =>
           history.push(redirect ? `/${redirect}/${product?.brand}` : '/')
         }
       >
-        <i className='fas fa-arrow-left'></i> Go Back
+        <i className="fas fa-arrow-left"></i> Go Back
       </Button>
 
       {loading ? (
@@ -96,21 +117,24 @@ const addToCartHandler = () =>{
         <AlertMessage>{error}</AlertMessage>
       ) : (
         <>
-       
-          <Row className='my-4'>
-          {cartError && <AlertMessage>{cartError}</AlertMessage>}
-        {cartSuccess && <AlertMessage variant='success'>Your product is added to cart</AlertMessage>}
+          <Row className="my-4">
+            {cartError && <AlertMessage>{cartError}</AlertMessage>}
+            {cartSuccess && (
+              <AlertMessage variant="success">
+                Your product is added to cart
+              </AlertMessage>
+            )}
             <Col md={3}>
               <Image
                 style={{ width: '100%', height: 'auto' }}
-                alt=''
+                alt=""
                 fluid
                 src={product.mainImage}
               />
             </Col>
 
             <Col md={5}>
-              <ListGroup variant='flush'>
+              <ListGroup variant="flush">
                 <ListGroup.Item>
                   <h3>{product.name}</h3>
                 </ListGroup.Item>
@@ -129,18 +153,18 @@ const addToCartHandler = () =>{
                       {product.version.map((pro) => (
                         <Col
                           key={pro._id}
-                          className='my-2 d-flex align-items-stretch'
+                          className="my-2 d-flex align-items-stretch"
                           md={6}
                         >
                           <Card>
                             <Card.Body>
                               <Form.Check
                                 label={pro.version}
-                                type='radio'
-                                onChange={e=> setVersion(e.target.value)}
+                                type="radio"
+                                onChange={(e) => setVersion(e.target.value)}
                                 inline
-                                name='group1'
-                                aria-label='radio 1'
+                                name="group1"
+                                aria-label="radio 1"
                                 value={`${pro.price} ${pro.version}`}
                               />
                               <h6>Price: ${pro.price} </h6>
@@ -158,16 +182,16 @@ const addToCartHandler = () =>{
                     {product.colors.map((pro) => (
                       <Col key={pro._id} md={5}>
                         <Card>
-                          <Card.Img src={pro.image} variant='top' fluid />
+                          <Card.Img src={pro.image} variant="top" fluid />
                           <Card.Body>
                             <Form.Check
-                              type='radio'
+                              type="radio"
                               inline
-                              name='group2'
+                              name="group2"
                               label={pro.color}
-                              aria-label='radio 3'
+                              aria-label="radio 3"
                               value={pro.image}
-                              onChange={(e)=> setColor(e.target.value)}
+                              onChange={(e) => setColor(e.target.value)}
                             />
                           </Card.Body>
                         </Card>
@@ -177,12 +201,18 @@ const addToCartHandler = () =>{
                 </ListGroup.Item>
               </ListGroup>
               <ListGroup>
-                {cartLoading? <LoadingButton varinat='dark'>Adding....</LoadingButton> :
-                 <Button onClick={addToCartHandler} variant='primary' className='my-3' disabled={!color || !version}>
-                 <i className='fas fa-plus'></i> Add to cart
-               </Button>
-                }
-               
+                {cartLoading ? (
+                  <LoadingButton varinat="dark">Adding....</LoadingButton>
+                ) : (
+                  <Button
+                    onClick={addToCartHandler}
+                    variant="primary"
+                    className="my-3"
+                    disabled={!color || !version}
+                  >
+                    <i className="fas fa-plus"></i> Add to cart
+                  </Button>
+                )}
               </ListGroup>
             </Col>
 
@@ -230,16 +260,16 @@ const addToCartHandler = () =>{
               </ListGroup>
             </Col>
           </Row>
-          <Row className='my-5'>
+          <Row className="my-5">
             <Col md={8}>
               <h2>Description</h2>
               <h5>{product.description}</h5>
             </Col>
           </Row>
-          <Row className='py-3'>
+          <Row className="py-3">
             <Col md={6}>
               <h2>Reviews</h2>
-              <ListGroup variant='flush'>
+              <ListGroup variant="flush">
                 {!authenticated ? (
                   <AlertMessage>
                     You have to{' '}
@@ -250,35 +280,52 @@ const addToCartHandler = () =>{
                   </AlertMessage>
                 ) : (
                   <>
-                    <ListGroup.Item className='py-3'>
+                    <ListGroup.Item className="py-3">
                       <h4>Write a review</h4>
-                      {show && <AlertMessage variant='info'>{show}</AlertMessage>}
-                      {reviewError && <AlertMessage>{reviewError}</AlertMessage>}
+                      {show && (
+                        <AlertMessage variant="info">{show}</AlertMessage>
+                      )}
+                      {reviewError && (
+                        <AlertMessage>{reviewError}</AlertMessage>
+                      )}
                       <Form onSubmit={reviewHandler}>
-                        <Form.Group controlId='rating'>
+                        <Form.Group controlId="rating">
                           <Form.Label>Rating</Form.Label>
-                          <Form.Control value={star} as='select' onChange={e=> setStar(e.target.value)}>
-                            <option value=''>Select...</option>
-                            <option value='1'>1- Poor</option>
-                            <option value='2'>2- Acceptable</option>
-                            <option value='3'>3- Good</option>
-                            <option value='4'>4- Best</option>
-                            <option value='5'>5- Excellent</option>
+                          <Form.Control
+                            value={star}
+                            as="select"
+                            onChange={(e) => setStar(e.target.value)}
+                          >
+                            <option value="">Select...</option>
+                            <option value="1">1- Poor</option>
+                            <option value="2">2- Acceptable</option>
+                            <option value="3">3- Good</option>
+                            <option value="4">4- Best</option>
+                            <option value="5">5- Excellent</option>
                           </Form.Control>
                         </Form.Group>
-                        <Form.Group controlId='comment'>
+                        <Form.Group controlId="comment">
                           <Form.Label>Your opinion in this product</Form.Label>
-                          <Form.Control as='textarea' row='3' value={comment} onChange={e=> setComment(e.target.value)}></Form.Control>
+                          <Form.Control
+                            as="textarea"
+                            row="3"
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                          ></Form.Control>
                         </Form.Group>
-                       {!reviewLoading ?  <Button
-                          className='my-4'
-                          variant='success'
-                          type='submit'
-                        >
-                          Submit
-                        </Button> :
-                        <LoadingButton varinat='dark'>Submitting....</LoadingButton>
-                         }
+                        {!reviewLoading ? (
+                          <Button
+                            className="my-4"
+                            variant="success"
+                            type="submit"
+                          >
+                            Submit
+                          </Button>
+                        ) : (
+                          <LoadingButton varinat="dark">
+                            Submitting....
+                          </LoadingButton>
+                        )}
                       </Form>
                     </ListGroup.Item>
                   </>
@@ -287,9 +334,9 @@ const addToCartHandler = () =>{
             </Col>
             <Col md={6}>
               <h2>Some reviews from user</h2>
-              <ListGroup variant='flush'>
+              <ListGroup variant="flush">
                 {product.reviews.length <= 0 ? (
-                  <AlertMessage variant='info'>
+                  <AlertMessage variant="info">
                     No reviews for this product. You can write one.
                   </AlertMessage>
                 ) : (
