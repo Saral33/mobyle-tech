@@ -167,7 +167,12 @@ const ProductDetailScreen = ({ match, history, location }) => {
                                 aria-label="radio 1"
                                 value={`${pro.price} ${pro.version}`}
                               />
-                              <h6>Price: ${pro.price} </h6>
+                              <h6>
+                                Price:{' '}
+                                {pro.price.includes('$')
+                                  ? pro.price
+                                  : '$' + pro.price}{' '}
+                              </h6>
                             </Card.Body>
                           </Card>
                         </Col>
