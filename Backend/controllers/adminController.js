@@ -118,7 +118,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 });
 
 const createProduct = asyncHandler(async (req, res) => {
-  const {
+  let {
     name,
     mainImage,
     brand,
@@ -132,6 +132,12 @@ const createProduct = asyncHandler(async (req, res) => {
     frontCamera,
     description,
   } = req.body;
+
+  version = version.map((x) =>
+    x.price.includes('$')
+      ? { version: x.version, price: x.price.replace('$', '').trim() }
+      : x
+  );
 
   const product = new Product({
     name,
@@ -148,7 +154,8 @@ const createProduct = asyncHandler(async (req, res) => {
     description,
   });
   await product.save();
-  res.json({ msg: 'Product Created successfully' });
+
+  res.json({ msg: 'New product added' });
 });
 
 module.exports = {
