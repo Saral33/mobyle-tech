@@ -80,6 +80,9 @@ footer {
   width: 100%;
 }
 
+img:hover {
+  cursor: pointer;
+}
 .footer-list-links {
   display: flex;
   flex-direction: row;
@@ -91,6 +94,9 @@ footer {
   flex: 0 0 70%;
   justify-content: center;
   align-items: center;
+}
+.search__form input {
+  background-color: rgb(233, 231, 231);
 }
 
 @media only screen and (max-width: 860px) {

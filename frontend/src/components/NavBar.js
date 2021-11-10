@@ -28,7 +28,7 @@ const NavBar = () => {
   return (
     <header>
       <Navbar
-        bg="danger"
+        bg="primary"
         variant="dark"
         expand="lg"
         className="p-4"

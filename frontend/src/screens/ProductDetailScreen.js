@@ -23,6 +23,9 @@ const ProductDetailScreen = ({ match, history, location }) => {
   const dispatch = useDispatch();
   const [star, setStar] = useState(0); //For rating
   const [id, setId] = useState('');
+  const [showMagnifier, setShowMagnifier] = useState(false); //For magnifying image
+  const [[imgWidth, imgHeight], setSize] = useState([0, 0]);
+  const [[x, y], setXY] = useState([0, 0]); //For magnifying image
   const [show, setShow] = useState('');
   const [comment, setComment] = useState(''); //For review
 
@@ -87,7 +90,6 @@ const ProductDetailScreen = ({ match, history, location }) => {
     const finalVersion = version.split(' ')[1];
     if (price.includes('$')) {
       price = price.replace('$', '');
-      console.log(price);
     }
     if (price && finalVersion) {
       dispatch(
@@ -108,7 +110,7 @@ const ProductDetailScreen = ({ match, history, location }) => {
           history.push(redirect ? `/${redirect}/${product?.brand}` : '/')
         }
       >
-        <i className="fas fa-arrow-left"></i> Go Back
+        <i className="fas fa-arrow-left"></i> Back
       </Button>
 
       {loading ? (
@@ -125,12 +127,61 @@ const ProductDetailScreen = ({ match, history, location }) => {
               </AlertMessage>
             )}
             <Col md={3}>
-              <Image
-                style={{ width: '100%', height: 'auto' }}
-                alt=""
-                fluid
-                src={product.mainImage}
-              />
+              <div style={{ position: 'relative' }}>
+                <Image
+                  onMouseEnter={(e) => {
+                    // update image size and turn-on magnifier
+                    const elem = e.currentTarget;
+                    const { width, height } = elem.getBoundingClientRect();
+                    setSize([width, height]);
+                    setShowMagnifier(true);
+                  }}
+                  onMouseMove={(e) => {
+                    // update cursor position
+                    const elem = e.currentTarget;
+                    const { top, left } = elem.getBoundingClientRect();
+
+                    // calculate cursor position on the image
+                    const x = e.pageX - left - window.pageXOffset;
+                    const y = e.pageY - top - window.pageYOffset;
+                    setXY([x, y]);
+                  }}
+                  onMouseLeave={() => setShowMagnifier(false)}
+                  style={{ width: '100%', height: 'auto' }}
+                  alt={product.name}
+                  fluid
+                  src={product.mainImage}
+                />
+                <div
+                  style={{
+                    display: showMagnifier ? '' : 'none',
+                    position: 'absolute',
+
+                    // prevent magnifier blocks the mousemove event of img
+                    pointerEvents: 'none',
+                    // set size of magnifier
+                    height: `400px`,
+                    width: `250px`,
+                    // move element center to cursor pos
+                    top: `${y - 400 / 2}px`,
+                    left: `${x - 250 / 2}px`,
+                    opacity: '1', // reduce opacity so you can verify position
+                    border: '1px solid lightgray',
+                    backgroundColor: 'white',
+                    backgroundImage: `url('${product.mainImage}')`,
+                    backgroundRepeat: 'no-repeat',
+
+                    //calculate zoomed image size
+                    backgroundSize: `${imgWidth * 1.55}px ${
+                      imgHeight * 1.55
+                    }px`,
+
+                    //calculate position of zoomed image.
+                    backgroundPositionX: `${-x * 1.55 + 250 / 2}px`,
+                    backgroundPositionY: `${-y * 1.55 + 400 / 2}px`,
+                  }}
+                ></div>
+              </div>
             </Col>
 
             <Col md={5}>
