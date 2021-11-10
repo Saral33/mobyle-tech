@@ -99,6 +99,14 @@ img:hover {
   background-color: rgb(233, 231, 231);
 }
 
+#tooltip__display {
+  padding: 5px 10px;
+  margin-right: 5px;
+  width: 250px;
+  background-color: rgb(235, 233, 233);
+  color: #000;
+}
+
 @media only screen and (max-width: 860px) {
   .footer-left {
     flex: 0 0 40%;

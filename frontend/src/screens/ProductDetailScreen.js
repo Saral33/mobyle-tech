@@ -7,6 +7,7 @@ import {
   Row,
   Form,
   Card,
+  OverlayTrigger,
 } from 'react-bootstrap';
 import Rating from '../components/Ratings';
 import { Link } from 'react-router-dom';
@@ -259,12 +260,33 @@ const ProductDetailScreen = ({ match, history, location }) => {
               <ListGroup>
                 {cartLoading ? (
                   <LoadingButton varinat="dark">Adding....</LoadingButton>
+                ) : !color || !version ? (
+                  <>
+                    <OverlayTrigger
+                      placement="top-end"
+                      overlay={
+                        <div id="tooltip__display">
+                          You have to select color and version inorder to add to
+                          cart
+                        </div>
+                      }
+                    >
+                      <Col md={12}>
+                        <Button
+                          style={{ pointerEvents: 'none', width: '100%' }}
+                          className="my-3"
+                          disabled
+                        >
+                          <i className="fas fa-plus"></i> Add to cart
+                        </Button>
+                      </Col>
+                    </OverlayTrigger>
+                  </>
                 ) : (
                   <Button
-                    onClick={addToCartHandler}
                     variant="primary"
                     className="my-3"
-                    disabled={!color || !version}
+                    onClick={addToCartHandler}
                   >
                     <i className="fas fa-plus"></i> Add to cart
                   </Button>

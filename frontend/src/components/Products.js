@@ -60,7 +60,10 @@ const Products = () => {
           ))}
           <Col className="d-flex justify-content-center my-4">
             {remaining > 0 && (
-              <Button onClick={() => setPage(page + 1)} variant="primary">
+              <Button
+                onClick={() => setPage(page + 1)}
+                variant="outline-primary"
+              >
                 Load More
               </Button>
             )}
