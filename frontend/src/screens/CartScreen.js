@@ -7,6 +7,7 @@ import AlertMessage from '../components/AlertMessage';
 import LoadingButton from '../components/LoadingButton';
 import { Link } from 'react-router-dom';
 import { DELETE_CART_RESET } from '../actions/constants';
+import emptyCart from '../Images/emptycart.png';
 import axios from 'axios';
 
 const CartScreen = ({ history }) => {
@@ -89,15 +90,37 @@ const CartScreen = ({ history }) => {
       <Row className="pt-5 px-5 mt-5 bg-light">
         <Col md={12}>
           <h2 className="text-center">My Cart</h2>
+          <Button
+            className="mb-2"
+            variant="outline-primary"
+            onClick={() => history.push('/')}
+          >
+            Go back
+          </Button>
           {loading ? (
             <Loader />
           ) : error ? (
-            <AlertMessage>{error}</AlertMessage>
+            <>
+              <h4 className="text-center ms-5">
+                Your cart is empty.Shop and fill it
+              </h4>
+              <Row className="d-flex justify-content-center">
+                <Col md={3}>
+                  <Image alt="Cart" src={emptyCart} />
+                </Col>
+              </Row>
+            </>
           ) : cartItem.length <= 0 ? (
-            <AlertMessage>
-              Your cart is empty. Shop first. Your cartItem can be accessed from
-              any device
-            </AlertMessage>
+            <>
+              <h4 className="text-center ms-5">
+                Your cart is empty.Shop and fill it
+              </h4>
+              <Row className="d-flex justify-content-center">
+                <Col md={3}>
+                  <Image alt="Cart" src={emptyCart} />
+                </Col>
+              </Row>
+            </>
           ) : (
             <>
               <ListGroup className="p-2" variant="flush">
