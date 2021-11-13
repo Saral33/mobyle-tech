@@ -71,6 +71,12 @@ const ProductDetailScreen = ({ match, history, location }) => {
       setShow('Review Submitted');
     }
   }, [match, dispatch, success]);
+
+  useEffect(() => {
+    if (cartSuccess) {
+      history.push('/cart');
+    }
+  }, [cartSuccess]);
   const reviewHandler = (e) => {
     e.preventDefault();
     dispatch(
@@ -122,11 +128,7 @@ const ProductDetailScreen = ({ match, history, location }) => {
         <>
           <Row className="my-4">
             {cartError && <AlertMessage>{cartError}</AlertMessage>}
-            {cartSuccess && (
-              <AlertMessage variant="success">
-                Your product is added to cart
-              </AlertMessage>
-            )}
+
             <Col md={3}>
               <div style={{ position: 'relative' }}>
                 <Image

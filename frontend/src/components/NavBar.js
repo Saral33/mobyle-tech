@@ -23,7 +23,7 @@ const NavBar = () => {
 
   useEffect(() => {
     dispatch(getCartItem());
-  }, [dispatch, success]);
+  }, [dispatch, success, authenticated]);
 
   return (
     <header>

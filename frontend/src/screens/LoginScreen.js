@@ -65,7 +65,7 @@ const LoginScreen = ({ history, location }) => {
           {loading ? (
             <LoadingButton> Loging in.....</LoadingButton>
           ) : (
-            <Button className="pt-2" variant="danger" type="submit">
+            <Button className="pt-2" variant="success" type="submit">
               Login
             </Button>
           )}
