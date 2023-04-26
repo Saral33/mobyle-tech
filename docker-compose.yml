@@ -12,16 +12,7 @@ services:
       - ./Backend:/app/Backend
       - /app/backend/node_modules
     environment:
-      - PORT=8080
-      - ADMIN_SECRET_KEY = admin12345
-      - BASE_URL = https://mobyletech.herokuapp.com
-      - CORS_URL = https://mobyletech-admin.netlify.app/
-      - ENVIRONMENT = development
-      - JWT_SECRET = mysecret123asd#$%^
-      - SECRET_PASSWORD_USER = p#5cDx4q>w#>92)yen,C$RS!_*b6.'
-      - MONGO_URI_OLD = mongodb+srv://admin:admin123@cluster0.j9wm3.mongodb.net/Mobishop?retryWrites=true&w=majority
-      - SENDGRID_API_KEY = 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
-      - MONGO_URI = mongodb+srv://admin:admin123@cluster0.j9wm3.mongodb.net/Mobishop?retryWrites=true&w=majority
+      - .env
 
   frontend:
     build:
