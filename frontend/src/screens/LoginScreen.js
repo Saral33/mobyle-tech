@@ -5,8 +5,8 @@ import FormContainer from '../components/FormContainer';
 import { useSelector, useDispatch } from 'react-redux';
 import AlertMessage from '../components/AlertMessage';
 import LoadingButton from '../components/LoadingButton';
-import { googleLoginUser, loginUser } from '../actions/userActions';
-import { GoogleLogin } from 'react-google-login';
+import { loginUser } from '../actions/userActions';
+import { customIo } from '../socketCOnfig';
 
 const LoginScreen = ({ history, location }) => {
   const [email, setEmail] = useState('');
@@ -23,13 +23,20 @@ const LoginScreen = ({ history, location }) => {
     }
   }, [authenticated, history, redirectRoute]);
 
+  // useEffect(() => {
+  //   socket.on('invalid', (schedules) => {
+  //     setSchedules(schedules);
+  //   });
+  // }, []);
+
   const submitHandler = (e) => {
     e.preventDefault();
     dispatch(loginUser({ email, password }));
+    customIo.emit('login', `Hi from ${email}`);
   };
-  const responseGoogle = (response) => {
-    dispatch(googleLoginUser({ tokenId: response.tokenId }));
-  };
+  // const responseGoogle = (response) => {
+  //   dispatch(googleLoginUser({ tokenId: response.tokenId }));
+  // };
   return (
     <FormContainer>
       <h2 className="my-3 text-center">
@@ -61,11 +68,11 @@ const LoginScreen = ({ history, location }) => {
             placeholder="Password"
           />
         </Form.Group>
-        <Row className="my-4">
+        <Row className="my-4 px-3">
           {loading ? (
             <LoadingButton> Loging in.....</LoadingButton>
           ) : (
-            <Button className="pt-2" variant="success" type="submit">
+            <Button className="pt-2 " variant="success" type="submit">
               Login
             </Button>
           )}
@@ -80,15 +87,15 @@ const LoginScreen = ({ history, location }) => {
         <Col>
           <hr />
         </Col>
-        <Col md="auto" xs="auto">
+        {/* <Col md="auto" xs="auto">
           {' '}
           OR{' '}
         </Col>
         <Col>
           <hr />
-        </Col>
+        </Col> */}
       </Row>
-      <Row>
+      {/* <Row>
         <Col md={12} className="d-flex justify-content-center">
           <GoogleLogin
             clientId="1078753984247-o7o9g8irhe361boeb2flcbjpau9p73rb.apps.googleusercontent.com"
@@ -113,7 +120,7 @@ const LoginScreen = ({ history, location }) => {
             cookiePolicy={'single_host_origin'}
           />
         </Col>
-      </Row>
+      </Row> */}
     </FormContainer>
   );
 };

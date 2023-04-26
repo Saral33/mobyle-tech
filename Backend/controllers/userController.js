@@ -2,8 +2,6 @@ const asyncHandler = require('express-async-handler');
 const User = require('../Models/userModel');
 const { activateAccountToken, passwordResetToken } = require('../config/email');
 const { google } = require('googleapis');
-const { OAuth2 } = google.auth;
-const bcrypt = require('bcryptjs');
 
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
@@ -36,67 +34,72 @@ const loginUser = asyncHandler(async (req, res) => {
   const user = await User.findOne({ email });
 
   if (!user || !(await user.comparePassword(password, user.password))) {
+    // io.emit('invalid', 'Invalid idiot');
     throw new Error('Invalid password or email');
   }
 
   if (!user.verified) {
     throw new Error('You have to activate your account. Check your inbox mail');
   }
+  const io = req.app.get('socketio');
   const token = await user.generateToken(3600 * 5);
   res.cookie('token', token, { httpOnly: true, maxAge: 3600000 * 5 });
+  io.emit('notificationAdmin', {
+    title: 'Login Alert',
+    email: user.email,
+    name: user.username,
+  });
   res.json({ message: 'Successfully login' });
 });
 
 const googleLoginUser = asyncHandler(async (req, res) => {
-  const client = new OAuth2(process.env.GOOGLE_CLIENT_ID);
-  const { tokenId } = req.body;
-  const verified = await client.verifyIdToken({
-    idToken: tokenId,
-    audience: process.env.GOOGLE_CLIENT_ID,
-  });
-  const { email_verified, email, name, picture } = verified.payload;
-  const password = email + process.env.SECRET_PASSWORD_USER;
-  const hashedPassword = await bcrypt.hash(password, 12);
-
-  if (email_verified) {
-    const user = await User.findOne({ email });
-
-    if (user && !user.googleLogin.status) {
-      user.googleLogin.secret = hashedPassword;
-      user.googleLogin.status = TransformStreamDefaultController;
-      const token = await user.generateToken(3600);
-      await user.save();
-      res
-        .cookie('token', token, { httpOnly: true, maxAge: 3600000 })
-        .json({ message: 'Successfully login' });
-    } else if (user && user.googleLogin.status) {
-      const isMatch = await bcrypt.compare(password, user.googleLogin.secret);
-      if (!isMatch) {
-        throw new Error('Some auth Error in google Login');
-      }
-      const token = await user.generateToken(3600 * 5);
-      res
-        .cookie('token', token, { httpOnly: true, maxAge: 3600000 * 5 })
-        .json({ message: 'Successfully login' });
-    } else {
-      const newUser = new User({
-        email,
-        username: name,
-        password: hashedPassword,
-        image: picture,
-        verified: true,
-      });
-      newUser.googleLogin.secret = hashedPassword;
-      newUser.googleLogin.status = true;
-      const tokenForUser = await newUser.generateToken(3600 * 5);
-      await newUser.save();
-      res.cookie('token', tokenForUser, {
-        httpOnly: true,
-        maxAge: 3600000 * 5,
-      });
-      res.json({ message: 'Successfully login' });
-    }
-  }
+  // const client = new OAuth2(process.env.GOOGLE_CLIENT_ID);
+  // const { tokenId } = req.body;
+  // const verified = await client.verifyIdToken({
+  //   idToken: tokenId,
+  //   audience: process.env.GOOGLE_CLIENT_ID,
+  // });
+  // const { email_verified, email, name, picture } = verified.payload;
+  // const password = email + process.env.SECRET_PASSWORD_USER;
+  // const hashedPassword = await bcrypt.hash(password, 12);
+  // if (email_verified) {
+  //   const user = await User.findOne({ email });
+  //   if (user && !user.googleLogin.status) {
+  //     user.googleLogin.secret = hashedPassword;
+  //     user.googleLogin.status = TransformStreamDefaultController;
+  //     const token = await user.generateToken(3600);
+  //     await user.save();
+  //     res
+  //       .cookie('token', token, { httpOnly: true, maxAge: 3600000 })
+  //       .json({ message: 'Successfully login' });
+  //   } else if (user && user.googleLogin.status) {
+  //     const isMatch = await bcrypt.compare(password, user.googleLogin.secret);
+  //     if (!isMatch) {
+  //       throw new Error('Some auth Error in google Login');
+  //     }
+  //     const token = await user.generateToken(3600 * 5);
+  //     res
+  //       .cookie('token', token, { httpOnly: true, maxAge: 3600000 * 5 })
+  //       .json({ message: 'Successfully login' });
+  //   } else {
+  //     const newUser = new User({
+  //       email,
+  //       username: name,
+  //       password: hashedPassword,
+  //       image: picture,
+  //       verified: true,
+  //     });
+  //     newUser.googleLogin.secret = hashedPassword;
+  //     newUser.googleLogin.status = true;
+  //     const tokenForUser = await newUser.generateToken(3600 * 5);
+  //     await newUser.save();
+  //     res.cookie('token', tokenForUser, {
+  //       httpOnly: true,
+  //       maxAge: 3600000 * 5,
+  //     });
+  //     res.json({ message: 'Successfully login' });
+  //   }
+  // }
 });
 
 const logoutUser = asyncHandler(async (req, res) => {

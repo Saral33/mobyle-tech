@@ -15,7 +15,7 @@ const loginAdmin = asyncHandler(async (req, res) => {
   if (user.role !== 'admin') {
     throw new Error('You arenot admin');
   }
-  if (code !== process.env.ADMIN_SECRET_key) {
+  if (code !== process.env.ADMIN_SECRET_KEY) {
     throw new Error('Invalid code');
   }
 

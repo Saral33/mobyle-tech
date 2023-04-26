@@ -85,7 +85,7 @@ const NavBar = () => {
                   {userInfo?.role === 'admin' && (
                     <NavDropdown title="Admin">
                       <NavDropdown.Item
-                        href="https://mobyletech-admin.netlify.app/login"
+                        href="http://localhost:3006/login"
                         target="_blank"
                       >
                         Admin Panel
